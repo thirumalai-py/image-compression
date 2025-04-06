@@ -34,11 +34,34 @@ Since Pillow requires native dependencies, a Lambda-compatible layer must be bui
 
 ### Steps:
 
-1. Create a Dockerfile that installs Pillow and packages it into a zip.
-2. Build the Docker image.
-3. Run the image to generate `pillow-layer.zip`.
-4. Upload the zip file to AWS Lambda as a layer.
-5. Attach the layer to your Lambda function.
+1. **Create a Dockerfile** that installs Pillow and packages it into a zip:
+
+    ```Dockerfile
+    FROM public.ecr.aws/lambda/python:3.9
+
+    RUN pip install pillow -t python
+
+    RUN zip -r pillow-layer.zip python
+    ```
+
+2. **Build the Docker image**:
+
+    ```bash
+    docker build -t pillow-layer .
+    ```
+
+3. **Run the image to generate `pillow-layer.zip`**:
+
+    ```bash
+    docker run --rm -v "$PWD":/var/task pillow-layer
+    ```
+
+4. **Upload `pillow-layer.zip` to AWS Lambda as a layer**:
+    - Go to AWS Lambda > Layers > Create Layer
+    - Upload the zip file
+    - Set the runtime to **Python 3.9**
+
+5. **Attach the layer to your Lambda function**.
 
 ---
 
